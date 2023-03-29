@@ -1,3 +1,4 @@
+%declare variables - these can be changed later
 samples = 0:3599;
 Fs = 360;
 Fc = 60;
@@ -5,19 +6,25 @@ endScript = false;
 Order = 2;
 xAxis = 10;
 
+%loop to generate as many graphs as needed
 while endScript == false
 
+    %clear command window
     clc;
 
+    %variables that can't be changed
     t = samples/Fs;
     Fn = (2*Fc/Fs);
     freqType = 'hertz';
        
+    %perform Fourier Transform
     FT = fftshift(fft(fftshift(noisySig)));
-      
+    
+    %Variables useful for FT Plot
     N = length(noisySig);     
     index = ceil(-N/2):floor(N/2)-1;
-        
+      
+    %determine units for FT Plot
     switch freqType
         case 'hertz'   
             f = Fs*index/N;       
@@ -29,19 +36,22 @@ while endScript == false
             f = 2*pi*index/N;        
             xString = 'Freq. (radians per sample)';        
         otherwise
-            % assume normalised freq. if the string is not recognised.       
+            %assume normalised freq. if the string is not recognised.       
             f = index/N;        
             xString = 'Freq. (cycles per sample)';        
     end
     
+    %IIR Butterworth Filters
     [b,a] = butter(Order, Fn);
     z = filter(b, a, noisySig);
     z2 = filtfilt(b, a, noisySig);
     
+    %FIR Chebyshev Filters
     c = fir1(Order, Fn, 'low');
     y = filter(c, 1, noisySig);
     y2 = filtfilt(c, 1, noisySig);
     
+    %show options
     disp("1: origSig");
     disp("2: noisySig");
     disp("3: FFT of noisySig");
@@ -55,7 +65,10 @@ while endScript == false
     
     viewGraph = input('Enter Number: ');
     
+    %choose input
     switch viewGraph
+
+        %origSig
         case 1
     
             clf;
@@ -67,6 +80,7 @@ while endScript == false
             xlim([0 xAxis]);
             ylim([-550 350]);
     
+        %noisySig
         case 2
     
             clf;
@@ -78,6 +92,7 @@ while endScript == false
             xlim([0 xAxis]);
             ylim([-550 350]);
     
+        %FFT Plot
         case 3
     
             clf;
@@ -90,6 +105,7 @@ while endScript == false
             text(-70, 1, "Mains Hum");
             text(49, 1, "Mains Hum");
     
+        %show filtered signals (IIR)
         case 4
 
             clf;
@@ -110,6 +126,7 @@ while endScript == false
             xlim([0 xAxis]);
             ylim([-550 350]);
 
+        %show filtered signals (FIR)
         case 5
     
             clf;
@@ -130,11 +147,13 @@ while endScript == false
             xlim([0 xAxis]);
             ylim([-550 350]);
     
+        %show filter design frequecy responses
         case 6
     
             fvtool(butter(2, Fn));
             fvtool(fir1(2, Fn));
     
+        %show comparions for IIR
         case 7
     
             clf;
@@ -167,6 +186,7 @@ while endScript == false
             xlim([0 xAxis]);
             ylim([-550 350]);
     
+        %show comparions for FIR
         case 8
     
             clf;
@@ -199,6 +219,7 @@ while endScript == false
             xlim([0 xAxis]);
             ylim([-550 350]);
     
+        %Change Variables
         case 9
     
             clc;
@@ -235,9 +256,11 @@ while endScript == false
 
             end
 
+        %close script
         case 0
             
             endScript = true;
+            %close figure
             close(1);
 
     end

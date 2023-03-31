@@ -47,7 +47,7 @@ while endScript == false
     z2 = filtfilt(b, a, noisySig);
     
     %FIR Chebyshev Filters
-    c = fir1(Order, Fn, 'low');
+    c = maxflat(Order, 'sym', Fn);
     y = filter(c, 1, noisySig);
     y2 = filtfilt(c, 1, noisySig);
     
@@ -57,10 +57,10 @@ while endScript == false
     disp("3: FFT of noisySig");
     disp("4: IIR Filtered noisySig");
     disp("5: FIR Filtered noisySig");
-    disp("6: Frequency Response of the Filters");
-    disp("7: Compare origSig and IIR Filtered Signal");
-    disp("8: Compare origSig and FIR Filtered Signal");
-    disp("9: Change Variables");
+    disp("6: Compare origSig and IIR Filtered Signal");
+    disp("7: Compare origSig and FIR Filtered Signal");
+    disp("8: Compare PQRST Complex");
+    disp("9: Change Variables"); 
     disp("0: End Script");
     
     viewGraph = input('Enter Number: ');
@@ -74,7 +74,8 @@ while endScript == false
             clf;
             figure(1)
             plot(t, origSig);
-            title("The Original Signal of a Patient With PVC")
+            title("Original ECG Signal")
+            subtitle("Of a 69 Year-Old Patient with PVC")
             xlabel("Time (seconds)")
             ylabel("Signal Amplitude (mV)")
             xlim([0 xAxis]);
@@ -86,7 +87,8 @@ while endScript == false
             clf;
             figure(1)
             plot(t, noisySig);
-            title("The Noisy Signal of a Patient With PVC")
+            title("Noisy ECG Signal")
+            subtitle("Of a 69 Year-Old Patient with PVC")
             xlabel("Time (seconds)")
             ylabel("Signal Amplitude (mV)")
             xlim([0 xAxis]);
@@ -102,8 +104,7 @@ while endScript == false
             grid on
             ylabel('DFT amplitude (a.u.)');
             xlabel(xString);
-            text(-70, 1, "Mains Hum");
-            text(49, 1, "Mains Hum");
+            xline(60, '--k', 'Mains Hum');
     
         %show filtered signals (IIR)
         case 4
@@ -115,16 +116,16 @@ while endScript == false
             title("The IIR Filtered Signal of a Patient With PVC (filter())")
             xlabel("Time (seconds)")
             ylabel("Signal Amplitude (mV)")
-            xlim([0 xAxis]);
-            ylim([-550 350]);
+            xlim([2.5 3.5]);
+            ylim([-100 300]);
 
             subplot(2,1,2)
             plot(t, z2);
             title("The IIR Filtered Signal of a Patient With PVC (filtfilt())")
             xlabel("Time (seconds)")
             ylabel("Signal Amplitude (mV)")
-            xlim([0 xAxis]);
-            ylim([-550 350]);
+            xlim([2.5 3.5]);
+            ylim([-100 300]);
 
         %show filtered signals (FIR)
         case 5
@@ -136,25 +137,19 @@ while endScript == false
             title("The FIR Filtered Signal of a Patient With PVC (filter())")
             xlabel("Time (seconds)")
             ylabel("Signal Amplitude (mV)")
-            xlim([0 xAxis]);
-            ylim([-550 350]);
+            xlim([2.5 3.5]);
+            ylim([-100 300]);
 
             subplot(2,1,2)
             plot(t, y2);
             title("The FIR Filtered Signal of a Patient With PVC (filtfilt())")
             xlabel("Time (seconds)")
             ylabel("Signal Amplitude (mV)")
-            xlim([0 xAxis]);
-            ylim([-550 350]);
-    
-        %show filter design frequecy responses
-        case 6
-    
-            fvtool(butter(2, Fn));
-            fvtool(fir1(2, Fn));
+            xlim([2.5 3.5]);
+            ylim([-100 300]);
     
         %show comparions for IIR
-        case 7
+        case 6
     
             clf;
             figure(1)
@@ -162,7 +157,7 @@ while endScript == false
             subplot(3,1,1)
             plot(t, origSig, "red");
             hold on
-            plot(t, z2, "blue");
+            plot(t, z, "blue");
             hold off
             title("The Original and IIR Filtered Signals of a Patient With PVC")
             xlabel("Time (seconds)")
@@ -179,7 +174,7 @@ while endScript == false
             ylim([-550 350]);
     
             subplot(3,1,3)
-            plot(t, z2, "blue");
+            plot(t, z, "blue");
             title("The IIR Filtered Signal of a Patient With PVC")
             xlabel("Time (seconds)")
             ylabel("Signal Amplitude (mV)")
@@ -187,7 +182,7 @@ while endScript == false
             ylim([-550 350]);
     
         %show comparions for FIR
-        case 8
+        case 7
     
             clf;
             figure(1)
@@ -195,7 +190,7 @@ while endScript == false
             subplot(3,1,1)
             plot(t, origSig, "red");
             hold on
-            plot(t, y2, "blue");
+            plot(t, y, "blue");
             hold off
             title("The Original and FIR Filtered Signals of a Patient With PVC")
             xlabel("Time (seconds)")
@@ -212,13 +207,41 @@ while endScript == false
             ylim([-550 350]);
     
             subplot(3,1,3)
-            plot(t, y2, "blue");
+            plot(t, y, "blue");
             title("The FIR Filtered Signal of a Patient With PVC")
             xlabel("Time (seconds)")
             ylabel("Signal Amplitude (mV)")
             xlim([0 xAxis]);
             ylim([-550 350]);
     
+
+        case 8
+
+            figure(1)
+            subplot(3,1,1)
+            plot(t, origSig, "red");
+            title("The Original Signal of a Patient With PVC")
+            xlabel("Time (seconds)")
+            ylabel("Signal Amplitude (mV)")
+            xlim([2.5 3.5]);
+            ylim([-100 300]);
+
+            subplot(3,1,2)
+            plot(t, z, "blue");
+            title("The IIR Filtered Signal of a Patient With PVC")
+            xlabel("Time (seconds)")
+            ylabel("Signal Amplitude (mV)")
+            xlim([2.5 3.5]);
+            ylim([-100 300]);
+
+            subplot(3,1,3)
+            plot(t, y, "Green");
+            title("The FIR Filtered Signal of a Patient With PVC")
+            xlabel("Time (seconds)")
+            ylabel("Signal Amplitude (mV)")
+            xlim([2.5 3.5]);
+            ylim([-100 300]);
+
         %Change Variables
         case 9
     
